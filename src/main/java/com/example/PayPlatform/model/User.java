@@ -22,12 +22,4 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-//    @PrePersist
-//    public void prePersist() {
-//        if (this.createdAt == null) {
-//            this.createdAt = LocalDateTime.now();
-//        }
-//    }
-
-
 }

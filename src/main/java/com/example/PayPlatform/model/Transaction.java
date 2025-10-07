@@ -1,7 +1,10 @@
 package com.example.PayPlatform.model;
 
+import com.example.PayPlatform.model.enums.TransactionStatus;
+import com.example.PayPlatform.model.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,10 +17,11 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;
+    private TransactionType type;
     private String iban;
     private BigDecimal amount;
-    private String status;
+    private TransactionStatus status;
+    @CreationTimestamp
     private LocalDateTime time;
 
     @ManyToOne

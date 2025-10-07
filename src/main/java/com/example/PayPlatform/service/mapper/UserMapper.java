@@ -9,11 +9,9 @@ public class UserMapper {
 
     public User fromDto (UserDto userDto){
         User user=new User();
-        //user.setId(userDto.getId());
         user.setName(userDto.getName());
         user.setIban(userDto.getIban());
         user.setBalance(userDto.getBalance());
-        //user.setCreatedAt(userDto.getCreatedAt());
         return user;
     }
 

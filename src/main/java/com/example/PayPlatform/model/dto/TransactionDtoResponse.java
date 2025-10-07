@@ -1,20 +1,23 @@
 package com.example.PayPlatform.model.dto;
 
-import com.example.PayPlatform.model.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.PayPlatform.model.enums.TransactionStatus;
+import com.example.PayPlatform.model.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionDtoResponse {
 
     private Long id;
-    private String type;
+    private TransactionType type;
     private BigDecimal amount;
-    private String status;
+    private TransactionStatus status;
     private LocalDateTime time;
+    private String iban;
+    private Long fromUserId;
+    private Long toUserId;
 
 }
