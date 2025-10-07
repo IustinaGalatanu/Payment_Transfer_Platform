@@ -2,6 +2,7 @@ package com.example.PayPlatform.model;
 
 import com.example.PayPlatform.model.enums.TransactionStatus;
 import com.example.PayPlatform.model.enums.TransactionType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;

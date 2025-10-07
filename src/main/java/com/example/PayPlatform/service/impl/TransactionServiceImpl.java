@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,6 +125,26 @@ public class TransactionServiceImpl implements TransactionService {
         Optional<Transaction> transactionOptional=transactionRepository.findById(id);
         Optional<TransactionDtoResponse> transactionDtoResponse=transactionOptional.map(transactionMapper::toDto);
         return transactionDtoResponse;
+    }
+
+    @Override
+    public List<TransactionDtoResponse> findByUserId(Long id) {
+        User user= userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Transaction> transactionsList = transactionRepository.findByFromUser_IdOrToUser_Id(id,id);
+        List<TransactionDtoResponse> transactionsDtoResponseList = transactionsList.stream()
+                .map(transactionMapper::toDto)
+                .toList();
+        return transactionsDtoResponseList;
+    }
+
+    @Override
+    public List<TransactionDtoResponse> findByDateBetween(LocalDateTime startTime, LocalDateTime endTime) {
+        List<Transaction> transactionsList = transactionRepository.findByTimeBetween(startTime,endTime);
+        List<TransactionDtoResponse> transactionsDtoResponseList = transactionsList.stream()
+                .map(transaction -> transactionMapper.toDto(transaction))
+                .toList();
+        return transactionsDtoResponseList;
     }
 
     @Override
