@@ -8,6 +8,7 @@ import com.example.PayPlatform.model.enums.TransactionStatus;
 import com.example.PayPlatform.model.enums.TransactionType;
 import com.example.PayPlatform.repository.TransactionRepository;
 import com.example.PayPlatform.repository.UserRepository;
+import com.example.PayPlatform.service.AlertService;
 import com.example.PayPlatform.service.TransactionService;
 import com.example.PayPlatform.service.mapper.TransactionMapper;
 import jakarta.transaction.Transactional;
@@ -26,11 +27,13 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final AlertService alertService;
 
-    public TransactionServiceImpl(TransactionMapper transactionMapper, TransactionRepository transactionRepository, UserRepository userRepository) {
+    public TransactionServiceImpl(TransactionMapper transactionMapper, TransactionRepository transactionRepository, UserRepository userRepository, AlertService alertService) {
         this.transactionMapper = transactionMapper;
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
+        this.alertService = alertService;
     }
 
     @Override
@@ -84,8 +87,10 @@ public class TransactionServiceImpl implements TransactionService {
             case TRANSFER:
                 if (transaction.getFromUser().getBalance().compareTo(transaction.getAmount())<0){
                     transaction.setStatus(TransactionStatus.FAILED);
-                    transactionRepository.save(transaction);
+                    Transaction savedTransaction=transactionRepository.save(transaction);
+                    alertService.checkForAlerts(savedTransaction,savedTransaction.getFromUser().getBalance());
                     throw new RuntimeException("Insufficient funds");
+
                 }
                 transaction.getFromUser().setBalance(transaction.getFromUser().getBalance().subtract(transaction.getAmount()));
                 transaction.getToUser().setBalance(transaction.getToUser().getBalance().add(transaction.getAmount()));
@@ -95,7 +100,8 @@ public class TransactionServiceImpl implements TransactionService {
             case WITHDRAW:
                 if(transaction.getFromUser().getBalance().compareTo(transaction.getAmount())<0) {
                     transaction.setStatus(TransactionStatus.FAILED);
-                    transactionRepository.save(transaction);
+                    Transaction savedTransaction=transactionRepository.save(transaction);
+                    alertService.checkForAlerts(savedTransaction,savedTransaction.getFromUser().getBalance());
                     throw new RuntimeException("Insufficient funds");
                 }
                 transaction.getFromUser().setBalance(transaction.getFromUser().getBalance().subtract(transaction.getAmount()));
@@ -108,6 +114,14 @@ public class TransactionServiceImpl implements TransactionService {
             userRepository.save(transaction.getToUser());
         }
         Transaction transactionSaved = transactionRepository.save(transaction);
+        if(transactionSaved.getFromUser()!=null){
+            BigDecimal balance = transactionSaved.getFromUser().getBalance();
+            alertService.checkForAlerts(transactionSaved,balance);
+        }
+        if(transactionSaved.getToUser()!=null){
+            BigDecimal balance = transactionSaved.getToUser().getBalance();
+            alertService.checkForAlerts(transactionSaved,balance);
+        }
         return transactionMapper.toDto(transactionSaved);
     }
 
