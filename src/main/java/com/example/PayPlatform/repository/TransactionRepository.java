@@ -12,4 +12,5 @@ public interface TransactionRepository extends JpaRepository<Transaction,Long> {
     List<Transaction> findByFromUser_IdOrToUser_Id(Long fromId, Long toId);
     List<Transaction> findByTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
     Long countByFromUser_IdAndTimeAfter(Long userId, LocalDateTime time);
+    Long countByToUser_IdAndTimeAfter(Long userId, LocalDateTime time);
 }

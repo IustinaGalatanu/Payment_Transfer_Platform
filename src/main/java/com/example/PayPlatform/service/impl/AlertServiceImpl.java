@@ -11,13 +11,17 @@ import com.example.PayPlatform.repository.TransactionRepository;
 import com.example.PayPlatform.repository.UserRepository;
 import com.example.PayPlatform.service.AlertService;
 import com.example.PayPlatform.service.mapper.AlertMapper;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRES_NEW)
+
 public class AlertServiceImpl implements AlertService {
 
     private final AlertMapper alertMapper;
@@ -51,7 +55,12 @@ public class AlertServiceImpl implements AlertService {
         }
 
         LocalDateTime oneMinuteAgo= LocalDateTime.now().minusMinutes(1);
-        Long recentTransaction= transactionRepository.countByFromUser_IdAndTimeAfter(userId,oneMinuteAgo);
+        Long recentTransaction= 0L;
+        if(transaction.getFromUser()!=null){
+            recentTransaction= transactionRepository.countByFromUser_IdAndTimeAfter(userId,oneMinuteAgo);
+        }else if(transaction.getToUser()!=null) {
+            recentTransaction= transactionRepository.countByToUser_IdAndTimeAfter(userId,oneMinuteAgo);
+        }
         if(recentTransaction>5){
             save(userId,AlertType.SUSPICIOUS_ACTIVITY,"Too many transactions made in the last minute");
         }

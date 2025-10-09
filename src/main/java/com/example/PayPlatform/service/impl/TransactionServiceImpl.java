@@ -82,12 +82,16 @@ public class TransactionServiceImpl implements TransactionService {
             case DEPOSIT :
                 transaction.getToUser().setBalance(transaction.getToUser().getBalance().add(transaction.getAmount()));
                 transaction.setStatus(TransactionStatus.SUCCESS);
+                Transaction savedDeposit=transactionRepository.save(transaction);
+                transactionRepository.flush();
+                alertService.checkForAlerts(savedDeposit,savedDeposit.getToUser().getBalance());
                 break;
 
             case TRANSFER:
                 if (transaction.getFromUser().getBalance().compareTo(transaction.getAmount())<0){
                     transaction.setStatus(TransactionStatus.FAILED);
                     Transaction savedTransaction=transactionRepository.save(transaction);
+                    transactionRepository.flush();
                     alertService.checkForAlerts(savedTransaction,savedTransaction.getFromUser().getBalance());
                     throw new RuntimeException("Insufficient funds");
 
@@ -101,6 +105,8 @@ public class TransactionServiceImpl implements TransactionService {
                 if(transaction.getFromUser().getBalance().compareTo(transaction.getAmount())<0) {
                     transaction.setStatus(TransactionStatus.FAILED);
                     Transaction savedTransaction=transactionRepository.save(transaction);
+                    transactionRepository.flush();
+
                     alertService.checkForAlerts(savedTransaction,savedTransaction.getFromUser().getBalance());
                     throw new RuntimeException("Insufficient funds");
                 }
