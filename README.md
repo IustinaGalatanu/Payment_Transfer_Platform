@@ -45,18 +45,6 @@ The goal was to implement a realistic business workflow with transaction safety 
 
 ---
 
-## Architecture
-
-
-com.example.payplatform
-├── controller/ → REST endpoints
-├── model/ → Entities (User, Transaction, Alert)
-├── dto/ → Request/Response DTOs
-├── repository/ → JPA repositories
-├── service/ → Business logic interfaces
-└── service/impl/ → Implementations with validation and alerts
----
-
 ## Example Business Flow
 
 1. A user deposits 12,000 RON → balance increases → alert generated (HIGH_VALUE).  
